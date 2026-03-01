@@ -217,31 +217,31 @@ with tabs[1]:
     file = st.file_uploader("Upload File", type=["csv", "xlsx"])
 
     if file:
-        data = file.read()
+        data = file.getvalue()
         buf = BytesIO(data)
 
         if file.name.endswith(".csv"):
-
-            # SAFE CSV LOADING (FIX FOR KAGGLE DATASETS)
             try:
                 df = pd.read_csv(buf)
             except:
                 buf.seek(0)
                 df = pd.read_csv(buf, encoding="latin1")
-
         else:
             df = pd.read_excel(buf)
 
         st.dataframe(df, width="stretch")
-        st.success(f"Dataset loaded: {df.shape[0]} rows × {df.shape[1]} columns")
 
         if st.button("🚀 Train Model"):
 
+            buf.seek(0)
+
             r = requests.post(
                 f"{BACKEND_URL}/ingest/csv",
-                files={"file": (file.name, data, file.type)},
+                files={"file": (file.name, buf, "text/csv")},
                 headers=auth_headers()
             )
+
+            st.write(r.text)
 
             if r.status_code == 200:
                 s = r.json()["summary"]
