@@ -10,12 +10,6 @@ import json
 import os
 
 # ============================
-# DEMO MODE (for Streamlit Cloud)
-# ============================
-
-DEMO_MODE = os.getenv("DEMO_MODE", "true").lower() == "true"
-
-# ============================
 # CONFIG
 # ============================
 
@@ -35,8 +29,8 @@ st.set_page_config(
 if "token" not in st.session_state:
     st.session_state.token = None
 
-# Auto login for Streamlit Cloud demo
-st.session_state.logged_in = DEMO_MODE
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
 
 
 def auth_headers():
@@ -152,9 +146,6 @@ if "last_plot" not in st.session_state:
 
 st.title("🧠 SentinelAI – Automated Business Intelligence")
 
-if DEMO_MODE:
-    st.info("Running in demo mode. Backend APIs are simulated for preview.")
-
 tabs = st.tabs([
     "🔐 Login / Register",
     "📂 Upload Dataset",
@@ -196,27 +187,19 @@ with tabs[0]:
 
         else:
             if st.button("Login"):
+                r = requests.post(
+                    f"{BACKEND_URL}/auth/login",
+                    data={"username": email, "password": password}
+                )
 
-                if DEMO_MODE:
-                    st.session_state.token = "demo"
+                if r.status_code == 200:
+                    data = r.json()
+                    st.session_state.token = data["access_token"]
                     st.session_state.logged_in = True
-                    st.success("Demo login successful")
+                    st.success("Logged in successfully!")
                     st.rerun()
-            
                 else:
-                    r = requests.post(
-                        f"{BACKEND_URL}/auth/login",
-                        data={"username": email, "password": password}
-                    )
-            
-                    if r.status_code == 200:
-                        data = r.json()
-                        st.session_state.token = data["access_token"]
-                        st.session_state.logged_in = True
-                        st.success("Logged in successfully!")
-                        st.rerun()
-                    else:
-                        st.error("Invalid credentials")
+                    st.error("Invalid credentials")
 
 # ============================
 # TAB 1 — UPLOAD DATASET
@@ -249,46 +232,18 @@ with tabs[1]:
         else:
             df = pd.read_excel(buf)
 
-        st.dataframe(df, use_container_width=True)
+        st.dataframe(df, width="stretch")
         st.success(f"Dataset loaded: {df.shape[0]} rows × {df.shape[1]} columns")
 
         if st.button("🚀 Train Model"):
 
-            if DEMO_MODE:
-        
-                st.success("Dataset processed successfully (Demo Mode)")
-        
-                s = {
-                    "rows": df.shape[0],
-                    "target_column": "Sales",
-                    "problem_type": "Regression",
-                    "best_model": "XGBoost",
-                    "best_score": 0.92,
-                    "model_scores": {
-                        "XGBoost": 0.92,
-                        "RandomForest": 0.88,
-                        "LinearRegression": 0.81
-                    },
-                    "top_features": {
-                        "Sales": 0.42,
-                        "Profit": 0.31,
-                        "Quantity": 0.19,
-                        "Discount": 0.08
-                    }
-                }
-        
-            else:
-        
-                r = requests.post(
-                    f"{BACKEND_URL}/ingest/csv",
-                    files={"file": (file.name, data, file.type)},
-                    headers=auth_headers()
-                )
-        
-                if r.status_code != 200:
-                    st.error("Backend error")
-                    st.stop()
-        
+            r = requests.post(
+                f"{BACKEND_URL}/ingest/csv",
+                files={"file": (file.name, data, file.type)},
+                headers=auth_headers()
+            )
+
+            if r.status_code == 200:
                 s = r.json()["summary"]
 
                 st.success("Model Trained")
@@ -454,7 +409,7 @@ Based on the dataset structure, SentinelAI identified this as a **{s.get("proble
                         color="Model"
                     )
 
-                    st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, width="stretch")
 
                 st.divider()
 
@@ -478,7 +433,7 @@ Based on the dataset structure, SentinelAI identified this as a **{s.get("proble
                         orientation="h"
                     )
 
-                    st.plotly_chart(fig2, use_container_width=True)
+                    st.plotly_chart(fig2, width="stretch")
 
                 # ============================
                 # AI SUMMARY
@@ -536,7 +491,7 @@ Based on the dataset structure, SentinelAI identified this as a **{s.get("proble
                             else:
                                 continue
 
-                            st.plotly_chart(fig, use_container_width=True)
+                            st.plotly_chart(fig, width="stretch")
 
                             st.session_state.last_plot = chart
 
@@ -570,45 +525,27 @@ with tabs[2]:
 
         with st.spinner("SentinelAI is analyzing your data..."):
 
-            if DEMO_MODE:
+            r = requests.post(
+                f"{BACKEND_URL}/copilot/ask",
+                json={"question": question},
+                headers=auth_headers()
+            )
 
-                st.success("Insight generated (Demo Mode)")
+            if r.status_code == 200:
 
-                st.write(
-                    "📊 **Insight:** Technology category shows the highest overall "
-                    "profit and sales in the dataset. This indicates strong demand "
-                    "and better margins compared to other categories."
-                )
+                data = r.json()["copilot_response"]
 
-                st.write(
-                    "💡 **Recommendation:** Consider increasing inventory and "
-                    "marketing efforts for high-performing technology products "
-                    "to maximize revenue."
-                )
+                message = {
+                    "question": question,
+                    "answer": data.get("answer"),
+                    "analysis": data.get("analysis"),
+                    "charts": data.get("charts"),
+                    "insights": data.get("insights"),
+                    "suggestions": data.get("suggestions")
+                }
 
-            else:
-
-                r = requests.post(
-                    f"{BACKEND_URL}/copilot/ask",
-                    json={"question": question},
-                    headers=auth_headers()
-                )
-
-                if r.status_code == 200:
-
-                    data = r.json()["copilot_response"]
-
-                    message = {
-                        "question": question,
-                        "answer": data.get("answer"),
-                        "analysis": data.get("analysis"),
-                        "charts": data.get("charts"),
-                        "insights": data.get("insights"),
-                        "suggestions": data.get("suggestions")
-                    }
-
-                    st.session_state.chat_history.append(message)
-                    save_chat(st.session_state.chat_history)
+                st.session_state.chat_history.append(message)
+                save_chat(st.session_state.chat_history)
 
     # ============================
     # DISPLAY CHAT HISTORY
@@ -757,7 +694,7 @@ with tabs[2]:
 
                     st.plotly_chart(
                         fig,
-                        use_container_width=True,
+                        width="stretch",
                         key=f"chat_chart_{msg.get('question','q')}_{chart['title']}_{id(chart)}"
                     )
 
@@ -944,7 +881,7 @@ with tabs[3]:
 
                 st.plotly_chart(
                     fig,
-                    use_container_width=True,
+                    width="stretch",
                     key=f"dashboard_chart_{name}_{chart['title']}_{id(chart)}"
                 )
 
