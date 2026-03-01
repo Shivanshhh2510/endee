@@ -232,7 +232,7 @@ with tabs[1]:
         else:
             df = pd.read_excel(buf)
 
-        st.dataframe(df, width="stretch")
+        st.dataframe(df, use_container_width=True)
         st.success(f"Dataset loaded: {df.shape[0]} rows × {df.shape[1]} columns")
 
         if st.button("🚀 Train Model"):
@@ -409,7 +409,7 @@ Based on the dataset structure, SentinelAI identified this as a **{s.get("proble
                         color="Model"
                     )
 
-                    st.plotly_chart(fig, width="stretch")
+                    st.plotly_chart(fig, use_container_width=True)
 
                 st.divider()
 
@@ -433,7 +433,7 @@ Based on the dataset structure, SentinelAI identified this as a **{s.get("proble
                         orientation="h"
                     )
 
-                    st.plotly_chart(fig2, width="stretch")
+                    st.plotly_chart(fig2, use_container_width=True)
 
                 # ============================
                 # AI SUMMARY
@@ -491,7 +491,7 @@ Based on the dataset structure, SentinelAI identified this as a **{s.get("proble
                             else:
                                 continue
 
-                            st.plotly_chart(fig, width="stretch")
+                            st.plotly_chart(fig, use_container_width=True)
 
                             st.session_state.last_plot = chart
 
@@ -694,7 +694,7 @@ with tabs[2]:
 
                     st.plotly_chart(
                         fig,
-                        width="stretch",
+                        use_container_width=True,
                         key=f"chat_chart_{msg.get('question','q')}_{chart['title']}_{id(chart)}"
                     )
 
@@ -881,7 +881,7 @@ with tabs[3]:
 
                 st.plotly_chart(
                     fig,
-                    width="stretch",
+                    use_container_width=True,
                     key=f"dashboard_chart_{name}_{chart['title']}_{id(chart)}"
                 )
 
