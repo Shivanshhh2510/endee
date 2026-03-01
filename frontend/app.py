@@ -255,36 +255,41 @@ with tabs[1]:
         if st.button("🚀 Train Model"):
 
             if DEMO_MODE:
-
+        
                 st.success("Dataset processed successfully (Demo Mode)")
-            
+        
                 s = {
                     "rows": df.shape[0],
-                    "target_column": "sales",
+                    "target_column": "Sales",
                     "problem_type": "Regression",
                     "best_model": "XGBoost",
                     "best_score": 0.92,
-                    "profile": {
-                        "numeric_columns": list(df.select_dtypes(include="number").columns),
-                        "categorical_columns": list(df.select_dtypes(include="object").columns),
-                        "datetime_columns": [],
-                        "identifier_columns": [],
-                        "missing_values": {},
-                        "duplicate_rows": 0,
-                        "high_cardinality_columns": []
+                    "model_scores": {
+                        "XGBoost": 0.92,
+                        "RandomForest": 0.88,
+                        "LinearRegression": 0.81
+                    },
+                    "top_features": {
+                        "Sales": 0.42,
+                        "Profit": 0.31,
+                        "Quantity": 0.19,
+                        "Discount": 0.08
                     }
                 }
-            
+        
             else:
-            
+        
                 r = requests.post(
                     f"{BACKEND_URL}/ingest/csv",
                     files={"file": (file.name, data, file.type)},
                     headers=auth_headers()
                 )
-            
-                if r.status_code == 200:
-                    s = r.json()["summary"]
+        
+                if r.status_code != 200:
+                    st.error("Backend error")
+                    st.stop()
+        
+                s = r.json()["summary"]
 
                 st.success("Model Trained")
 
