@@ -10,7 +10,6 @@ import json
 import os
 
 
-st.info("Demo mode enabled — backend services are simulated for evaluation.")
 # ============================
 # CONFIG
 # ============================
