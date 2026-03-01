@@ -188,7 +188,7 @@ with tabs[0]:
 
         else:
             if st.button("Login"):
-                 st.session_state.logged_in = True
+                st.session_state.logged_in = True
                 st.success("Demo login successful.")
                 st.rerun()
 
