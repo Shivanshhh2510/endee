@@ -26,9 +26,6 @@ else:
 # ==========================================
 
 def fallback_explanation(prediction, confidence, top_features):
-    """
-    Rule-based ML explanation (always works even if Gemini fails)
-    """
 
     feature_text = ", ".join(top_features) if top_features else "multiple dataset features"
 
@@ -44,26 +41,18 @@ def fallback_explanation(prediction, confidence, top_features):
 # ==========================================
 
 def fallback_rag_response(prompt: str):
-    """
-    Fallback if Gemini fails for RAG queries.
-    """
 
     return (
-        "Based on the retrieved dataset context, the answer can be derived "
-        "from the information shown above. However, AI reasoning service "
-        "is currently unavailable."
+        "AI reasoning service is currently unavailable due to API limits. "
+        "However, insights can still be derived from the charts and dataset analysis shown above."
     )
 
 
 # ==========================================
-# ML MODEL EXPLANATION (AutoML pipeline)
+# ML MODEL EXPLANATION
 # ==========================================
 
 def generate_explanation(prediction, confidence, top_features):
-    """
-    Generates explanation for ML predictions.
-    Uses Gemini if available, otherwise fallback.
-    """
 
     prompt = f"""
 You are an AI assistant explaining a machine learning prediction.
@@ -86,14 +75,17 @@ Keep it short, clear, and actionable.
             if response and hasattr(response, "text") and response.text:
                 return response.text.strip()
 
-        except Exception:
-            pass
+        except Exception as e:
+            print("[Gemini ERROR]:", str(e))
+
+            if "429" in str(e):
+                print("[Gemini] Quota exceeded — using fallback")
 
     return fallback_explanation(prediction, confidence, top_features)
 
 
 # ==========================================
-# GENERIC LLM RESPONSE (Used by RAG engine)
+# GENERIC LLM RESPONSE (RAG Engine)
 # ==========================================
 
 def generate_llm_response(prompt: str):
@@ -105,18 +97,18 @@ def generate_llm_response(prompt: str):
                 contents=prompt
             )
 
-            # DEBUG PRINT
             print("[Gemini answer]:", response)
 
-            # Method 1 (most common)
             if hasattr(response, "text") and response.text:
                 return response.text.strip()
 
-            # Method 2 (fallback parsing)
             if hasattr(response, "candidates"):
                 return response.candidates[0].content.parts[0].text.strip()
 
         except Exception as e:
             print("[Gemini ERROR]:", str(e))
+
+            if "429" in str(e):
+                print("[Gemini] Quota exceeded — using fallback")
 
     return fallback_rag_response(prompt)
