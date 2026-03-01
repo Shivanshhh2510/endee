@@ -9,6 +9,8 @@ import sqlite3
 import json
 import os
 
+
+st.info("Demo mode enabled — backend services are simulated for evaluation.")
 # ============================
 # CONFIG
 # ============================
@@ -29,8 +31,8 @@ st.set_page_config(
 if "token" not in st.session_state:
     st.session_state.token = None
 
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
+# Auto login for Streamlit Cloud demo
+st.session_state.logged_in = True
 
 
 def auth_headers():
@@ -187,10 +189,9 @@ with tabs[0]:
 
         else:
             if st.button("Login"):
-                r = requests.post(
-                    f"{BACKEND_URL}/auth/login",
-                    data={"username": email, "password": password}
-                )
+                 st.session_state.logged_in = True
+                st.success("Demo login successful.")
+                st.rerun()
 
                 if r.status_code == 200:
                     data = r.json()
