@@ -241,7 +241,6 @@ with tabs[1]:
                 headers=auth_headers()
             )
 
-            st.write(r.text)
 
             if r.status_code == 200:
                 s = r.json()["summary"]
