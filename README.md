@@ -97,6 +97,9 @@ Features:
 
 # System Workflow
 
+<img width="750" height="778" alt="image" src="https://github.com/user-attachments/assets/09f13e39-9965-42b0-b3fa-86f50d5565df" />
+
+
 1. User uploads a dataset (CSV or Excel)
 2. SentinelAI performs automatic dataset profiling
 3. Dataset context is embedded and stored in the vector database
