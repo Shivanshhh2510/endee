@@ -881,7 +881,7 @@ with tabs[3]:
                 st.plotly_chart(
                     fig,
                     width="stretch",
-                    key=f"dashboard_chart_{name}_{chart['title']}_{id(chart)}"
+                    key=f"dashboard_chart_{name}_{chart['title']}_{uuid.uuid4()}"
                 )
 
 st.divider()
