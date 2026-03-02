@@ -2,7 +2,7 @@
 
 SentinelAI is an AI-powered Business Intelligence assistant that enables users to ask questions about datasets in natural language and automatically generate insights, visualizations, and machine learning predictions.
 
-This project integrates the **Endee Vector Database** to power semantic search and retrieval for AI-driven analytics using a Retrieval Augmented Generation (RAG) architecture.
+This project integrates the **Endee Vector Database** to power semantic search and retrieval for AI-driven analytics using a **Retrieval Augmented Generation (RAG)** architecture.
 
 The goal is to make advanced data analysis accessible to non-technical users through natural language interaction.
 
@@ -12,278 +12,343 @@ The goal is to make advanced data analysis accessible to non-technical users thr
 
 Traditional data analysis tools require technical knowledge of SQL, Python, or BI platforms. SentinelAI removes this barrier by allowing users to simply ask questions about their data.
 
-Examples:
+Example queries:
 
-- "Show sales by region"
-- "Which category has highest profit?"
-- "Show monthly sales trend"
-- "Show profit distribution"
+- Show sales by region  
+- Which category has highest profit  
+- Show monthly sales trend  
+- Show profit distribution  
 
 The system automatically:
 
 - Understands the intent of the question
 - Retrieves relevant dataset context using vector search
-- Generates charts
+- Generates charts and visualizations
 - Produces AI insights and explanations
 
 ---
 
 # Key Features
 
-### AI Data Copilot
-Users can ask natural language questions about their dataset and receive charts, insights, and explanations instantly.
+## Dataset Upload
 
-### Automated Visualization Engine
-The system dynamically generates multiple chart types:
+- Upload **CSV or Excel datasets**
+- Automatic **data profiling**
 
-- Bar charts
-- Line charts
-- Scatter plots
-- Histograms
-- Pie charts
-- Area charts
-- Heatmaps
-
-### Intelligent Dataset Profiling
-Automatic analysis of:
+Detection includes:
 
 - Numeric columns
 - Categorical columns
+- Datetime columns
 - Missing values
-- Duplicate rows
-- High-cardinality features
-
-### AutoML Model Training
-Automatically detects the target variable and trains multiple ML models to identify the best performing one.
-
-### AI Insights Generation
-Charts are accompanied by AI-generated explanations so non-technical users can easily understand the findings.
-
-### Dashboard Builder
-Users can save generated charts and combine them into reusable dashboards.
-
-### RAG-based Query Engine
-SentinelAI uses **Retrieval Augmented Generation** to retrieve relevant dataset context and generate accurate responses.
+- High cardinality features
 
 ---
 
-# How Endee Vector Database is Used
+## AutoML Model Training
 
-Endee is used as the vector database powering semantic retrieval.
+Automatically trains multiple machine learning models:
 
-Workflow:
+- Logistic Regression
+- Random Forest
+- Extra Trees
+- XGBoost
+- LightGBM
 
-1. Dataset content is converted into embeddings
-2. Embeddings are stored in the Endee vector store
-3. User queries are converted into embeddings
-4. Endee retrieves the most relevant dataset context
-5. The AI engine generates insights using retrieved context
+SentinelAI automatically:
 
-This allows SentinelAI to perform intelligent data exploration and question answering.
+- Detects the problem type
+- Selects the target column
+- Evaluates model performance
+- Displays feature importance
 
 ---
 
-# System Architecture
-User
-│
-│ Natural Language Question
-▼
-Streamlit Frontend (UI)
-│
-▼
+## AI Data Copilot
+
+Users can ask questions about their dataset.
+
+Examples:
+
+- Show sales by region
+- Which category has highest profit
+- Explain this dataset
+
+The system performs:
+
+1. Intent detection  
+2. Analytical query execution  
+3. RAG retrieval from the vector database  
+4. AI reasoning using an LLM  
+
+---
+
+## Dashboard Builder
+
+Users can save generated charts into custom dashboards.
+
+Features:
+
+- Save charts generated from AI insights
+- Create multiple dashboards
+- Persistent storage using SQLite
+
+---
+
+# System Workflow
+
+1. User uploads a dataset (CSV or Excel)
+2. SentinelAI performs automatic dataset profiling
+3. Dataset context is embedded and stored in the vector database
+4. User asks a question in natural language
+5. Relevant dataset context is retrieved using vector search
+6. Analytical queries generate insights and charts
+7. AI produces explanations using an LLM
+
+---
+
+# Project Architecture
+
+```
+Frontend
+   │
+   │ Streamlit UI
+   ▼
 FastAPI Backend
-│
-├─ Intent Detection
-├─ Chart Generator
-├─ Query Engine
-│
-▼
-Embedding Generator
-│
-▼
-Endee Vector Database
-│
-▼
-RAG Query Engine
-│
-▼
-AI Copilot Response
-│
-▼
-Charts + Insights + Suggestions
+   │
+   ├── Authentication
+   ├── Dataset Ingestion
+   ├── AutoML Engine
+   ├── Analytical Query Engine
+   └── RAG Query Engine
+          │
+          ▼
+Vector Database (Endee)
+          │
+          ▼
+LLM Reasoning (Gemini API)
+```
+
+---
+
+# Application Screenshots
+
+## Dataset Upload and Model Training
+
+
+<img width="1184" height="1009" alt="image" src="https://github.com/user-attachments/assets/91f98a5c-6127-4e06-bf53-9c46305ff49d" />
+
+---
+
+## Dataset Intelligence and Model Insights
+
+
+<img width="1600" height="1043" alt="image" src="https://github.com/user-attachments/assets/80456bc2-2e03-4ab4-bce4-0dfcb8ec12f2" />
+
+<img width="1600" height="588" alt="image" src="https://github.com/user-attachments/assets/f2819727-6d09-4c70-a3d6-e6ea983e8183" />
+
+<img width="1600" height="561" alt="image" src="https://github.com/user-attachments/assets/c86a2fd4-0dca-490d-bde5-45efa2235dbc" />
+
+<img width="1600" height="650" alt="image" src="https://github.com/user-attachments/assets/fc5ab99b-54ee-4a8f-91a1-64d04034ac62" />
+
+<img width="1600" height="697" alt="image" src="https://github.com/user-attachments/assets/a1da1eea-9067-4625-8ae4-6891257f9c2f" />
 
 
 ---
 
-# Project Structure
-SentinelAI
-│
-├── app/
-│ ├── ai/ # AI copilot logic
-│ ├── analytics/ # chart & query engine
-│ ├── automl/ # model training
-│ ├── chat/ # intent detection & planner
-│ ├── ingestion/ # dataset loader
-│ ├── rag/ # retrieval engine
-│ ├── vector/ # Endee vector integration
-│ └── routes/ # API endpoints
-│
-├── frontend/
-│ └── app.py # Streamlit UI
-│
-├── data/ # sample datasets
-├── models/ # trained ML models
-├── reports/ # generated reports
-├── storage/ # database storage
-│
-├── requirements.txt
-└── README.md
+
+## AI Data Copilot Query Interface
+
+
+<img width="1474" height="845" alt="image" src="https://github.com/user-attachments/assets/abde026a-e7cb-4c88-b450-088886288af5" />
+
+<img width="1600" height="733" alt="image" src="https://github.com/user-attachments/assets/53c2b26f-15ce-4510-aba3-7475554e8486" />
+
+<img width="1600" height="624" alt="image" src="https://github.com/user-attachments/assets/84266d3d-faa7-47d2-a216-bf044ae96259" />
+
+<img width="1600" height="560" alt="image" src="https://github.com/user-attachments/assets/cff68975-2139-49da-be3d-652c14e96393" />
+
+<img width="1600" height="527" alt="image" src="https://github.com/user-attachments/assets/2ab617be-1271-40bf-ab26-dcf09c529cf5" />
+
+---
+
+
+## Custom Dashboard Builder
+
+
+<img width="1600" height="754" alt="image" src="https://github.com/user-attachments/assets/f71280e5-f85d-49c6-a912-da9254aac91e" />
 
 
 ---
 
 # Tech Stack
 
-### Backend
-- Python
-- FastAPI
+## Frontend
 
-### Frontend
-- Streamlit
+- Streamlit  
+- Plotly  
+- Pandas  
 
-### Machine Learning
-- Scikit-learn
-- XGBoost
+## Backend
 
-### Visualization
-- Plotly
+- FastAPI  
+- Python  
 
-### Vector Search
-- Endee Vector Database
-- FAISS
+## Machine Learning
 
-### Data Processing
-- Pandas
-- NumPy
+- Scikit-Learn  
+- XGBoost  
+- LightGBM  
+- Optuna  
+- SHAP  
+
+## AI + RAG
+
+- Gemini API  
+- Vector Embeddings  
+- Retrieval Augmented Generation  
+
+## Vector Database
+
+- Endee Vector DB (Docker)
+
+## Storage
+
+- SQLite
 
 ---
 
-# Installation
+# How to Run the Project Locally
 
-Clone the repository:
+## 1. Clone the Repository
 
+```bash
+git clone https://github.com/YOUR_USERNAME/sentinelai.git
+cd sentinelai
+```
 
-git clone https://github.com/YOUR_USERNAME/endee.git
+---
 
-cd endee
+## 2. Create Virtual Environment
 
+```bash
+python -m venv venv
+```
 
-Install dependencies:
+Activate environment:
 
+**Windows**
 
+```bash
+venv\Scripts\activate
+```
+
+**Mac / Linux**
+
+```bash
+source venv/bin/activate
+```
+
+---
+
+## 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
-
+```
 
 ---
 
-# Running the Backend
+## 4. Run Endee Vector Database (Docker)
 
-Start the FastAPI server:
+Make sure **Docker Desktop is running**.
 
+```bash
+docker run -p 8080:8080 endeeio/endee-server
+```
 
-python app/main.py
+---
 
+## 5. Set Environment Variables
 
-or
+Create a `.env` file:
 
+```
+GEMINI_API_KEY=your_gemini_api_key
+```
 
+---
+
+## 6. Start Backend Server
+
+```bash
 uvicorn app.main:app --reload
+```
 
+Backend runs at:
 
-Backend will run on:
-
-
+```
 http://127.0.0.1:8000
-
+```
 
 ---
 
-# Running the Frontend
+## 7. Run Streamlit Frontend
 
-Start the Streamlit app:
+```bash
+cd frontend
+streamlit run app.py
+```
 
+Open in browser:
 
-streamlit run frontend/app.py
-
-
-The app will open at:
-
-
+```
 http://localhost:8501
-
-
----
-
-# Example Queries
-
-Users can ask questions like:
-
-- Show sales by region
-- Which category has highest profit
-- Show monthly sales trend
-- Show profit distribution
-- Show correlation between sales and profit
+```
 
 ---
 
-# Example Output
+# Project Structure
 
-SentinelAI generates:
-
-- Interactive visualizations
-- AI-generated insights
-- Suggested follow-up questions
-- Automated dashboards
-
-This allows users to quickly understand complex datasets without writing code.
-
----
-
-# Use Cases
-
-SentinelAI can be used for:
-
-- Business intelligence
-- Sales analytics
-- Data exploration
-- Automated reporting
-- Decision support systems
+```
+sentinelai
+│
+├── app
+│   ├── ai
+│   ├── analytics
+│   ├── automl
+│   ├── ingestion
+│   ├── rag
+│   ├── routes
+│   └── vector
+│
+├── frontend
+│   └── app.py
+│
+├── storage
+│
+├── requirements.txt
+└── README.md
+```
 
 ---
 
 # Future Improvements
 
-- Multi-dataset analysis
-- Real-time data streaming
-- Advanced AI reasoning agents
-- Enterprise dashboard export
-- Natural language SQL generation
+- Multi-dataset support  
+- Chat history persistence  
+- User workspace dashboards  
+- Advanced chart recommendations  
+- Streamlit Cloud deployment  
 
 ---
 
 # Author
 
-Shivansh Mishra
-
-BTech Computer Science Engineering
-
-AI / Data Science / Machine Learning
+**Shivansh Mishra**  
+AI / Data Science Engineer  
+B.Tech Computer Science  
 
 ---
 
-# License
-
-This project builds upon the Endee open-source vector database.
-
-Original repository:
-https://github.com/endee-io/endee
+⭐ If you like this project, consider giving the repository a star on GitHub.
